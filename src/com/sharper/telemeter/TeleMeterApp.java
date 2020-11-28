@@ -5,6 +5,10 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -14,8 +18,20 @@ public class TeleMeterApp {
 
     public static void main(String[] args) {
 
-        String comPort = "ttyUSB0";
-        String serial = "39037291";
+        Properties properties = new Properties();
+
+        try {
+            InputStream inputStream = ClassLoader.getSystemResourceAsStream("config.properties");
+            properties.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String comPort = properties.getProperty("port");
+        String serial = properties.getProperty("serial");
+        String telegramUserName = properties.getProperty("botname");
+        String telegramToken = properties.getProperty("token");
+
 
         Meter meter = new Meter(comPort,serial);
         MeterReader reader = new MeterReader(meter);
@@ -26,7 +42,7 @@ public class TeleMeterApp {
 
         try{
             TelegramBotsApi botsApi= new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new Bot(reader));
+            botsApi.registerBot(new Bot(reader, telegramUserName, telegramToken));
 
 
         }

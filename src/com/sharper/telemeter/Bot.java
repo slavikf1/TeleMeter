@@ -10,13 +10,15 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Bot extends TelegramLongPollingBot {
     final int RECONNECT_PAUSE = 10000;
-    String userName = "SharperLearnsBot";
-    String token = "1422964152:AAEiUj-AJ6tLqARarKpOWA7uOnknwN00-MI";
+    String userName;
+    String token;
     MeterReader reader;
 
-    public Bot(MeterReader reader){
+    public Bot(MeterReader reader, String userName, String token){
         super();
         this.reader = reader;
+        this.token = token;
+        this.userName = userName;
     }
 
 
