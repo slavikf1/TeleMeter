@@ -1,6 +1,9 @@
 package com.sharper.telemeter;
 
 import com.sharper.meter.Meter;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +22,17 @@ public class TeleMeterApp {
 
         ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
         ScheduledFuture <?> scheduledFuture = ses.scheduleAtFixedRate(reader, 1, 10, TimeUnit.SECONDS);
-        System.out.println("Program run");
+        System.out.println("Schedule run... starting a bot");
+
+        try{
+            TelegramBotsApi botsApi= new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(new Bot(reader));
+
+
+        }
+        catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+
     }
 }

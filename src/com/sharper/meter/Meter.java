@@ -12,7 +12,7 @@ public class Meter {
     private final SerialPort port;
     private final int serial;
 
-    private static Readings lastReadings;
+    public Readings lastReadings;
 
     public Meter(String name, String serial){
         this.port = SerialPort.getCommPort(name);
