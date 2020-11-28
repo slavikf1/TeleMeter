@@ -18,7 +18,7 @@ public class TeleMeterApp {
 
     public static void main(String[] args) {
 
-        Properties properties = new Properties();
+        Properties properties = new Properties(); //getting port, telefragm credentials from a file
 
         try {
             InputStream inputStream = ClassLoader.getSystemResourceAsStream("config.properties");
@@ -38,7 +38,7 @@ public class TeleMeterApp {
 
         ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
         ScheduledFuture <?> scheduledFuture = ses.scheduleAtFixedRate(reader, 1, 10, TimeUnit.SECONDS);
-        System.out.println("Schedule run... starting a bot");
+        //System.out.println("Schedule run... starting a bot");
 
         try{
             TelegramBotsApi botsApi= new TelegramBotsApi(DefaultBotSession.class);
