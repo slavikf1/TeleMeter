@@ -1,6 +1,7 @@
 package com.sharper.meter;
 
 import com.fazecast.jSerialComm.SerialPort;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import java.nio.ByteBuffer;
@@ -11,13 +12,16 @@ public class Meter {
     private final SerialPort port;
     private final int serial;
 
+    private static Readings lastReadings;
+
     public Meter(String name, String serial){
         this.port = SerialPort.getCommPort(name);
         this.serial = Integer.parseInt(serial);
+
     }
 
-        //Senging string 1-Byte command and getting a response. Works with already initialized port.
-    private String getResponse(String message, int length) throws Exception{
+        //Senging string 1-Byte command and getting a response.
+    private String getResponse(String message, int length) throws InterruptedException, DecoderException {
 
         String returnedMessage = null;
         ByteBuffer outBuffer = ByteBuffer.allocate(7);
@@ -43,7 +47,7 @@ public class Meter {
     }
 
     //to get all Readings - see Readings class.
-    public Readings getReadings() throws Exception {
+    public Readings getReadings() throws DecoderException, InterruptedException {
 
         initSerialPort();
         int serialNum = Integer.valueOf(getResponse("2F",11),16);
@@ -56,6 +60,7 @@ public class Meter {
         float power = Float.parseFloat(instant.substring(8, 14))/1000;
         Readings result = new Readings(serialNum,day,night,current,power,voltage);
         port.closePort();
+        lastReadings = result;
         return result;
     }
 
@@ -83,13 +88,13 @@ public class Meter {
     }
 
     //get meter's Serial number
-    public int getSerialNum() throws Exception{
+    public int getSerialNum() throws DecoderException, InterruptedException {
         initSerialPort();
         port.closePort();
         return Integer.valueOf((this.getResponse("2F", 11)),16);
     }
 
-    private void initSerialPort() throws Exception {
+    private void initSerialPort() throws DecoderException, InterruptedException {
 
         port.openPort();
         port.setParity(SerialPort.NO_PARITY);
