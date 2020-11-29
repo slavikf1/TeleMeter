@@ -21,7 +21,7 @@ public class Meter {
     }
 
         //Senging string 1-Byte command and getting a response.
-    private String getResponse(String message, int length) throws InterruptedException, DecoderException {
+    private String getResponse(String message, int length) throws InterruptedException, DecoderException, ReadingException {
 
         String returnedMessage = null;
         ByteBuffer outBuffer = ByteBuffer.allocate(7);
@@ -41,13 +41,27 @@ public class Meter {
         Thread.sleep(90);
         port.readBytes(buffer, length);
         byte[] response = Arrays.copyOfRange(buffer, 5, length-2);
+        try {
+            byte[] responseCRC = Arrays.copyOfRange(buffer, length-2, length);
+            byte[] responseBase  = Arrays.copyOfRange(buffer, 0, length-3);
+
+            if(checkCRC(responseBase, responseCRC)){
+                throw new ReadingException("Incorrect data from meter");
+            }
+
+        }
+
+        catch (ArrayIndexOutOfBoundsException e){
+
+        }
+
         returnedMessage = Hex.encodeHexString(response);
         //port.closePort();
         return  returnedMessage;
     }
 
     //to get all Readings - see Readings class.
-    public Readings getReadings() throws DecoderException, InterruptedException {
+    public Readings getReadings() throws DecoderException, InterruptedException, ReadingException {
 
         initSerialPort();
         int serialNum = Integer.valueOf(getResponse("2F",11),16);
@@ -92,8 +106,13 @@ public class Meter {
         return result;
     }
 
+    private boolean checkCRC(byte[] input, byte[] crc) {
+        byte[] checkSum = crc16(input);
+        return Arrays.equals(crc, checkSum);
+    }
+
     //get meter's Serial number
-    public int getSerialNum() throws DecoderException, InterruptedException {
+    public int getSerialNum() throws DecoderException, InterruptedException, ReadingException {
         initSerialPort();
         port.closePort();
         return Integer.valueOf((this.getResponse("2F", 11)),16);

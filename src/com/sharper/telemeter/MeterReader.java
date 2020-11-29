@@ -2,6 +2,7 @@ package com.sharper.telemeter;
 
 import com.sharper.dao.ReadingsDAO;
 import com.sharper.meter.Meter;
+import com.sharper.meter.ReadingException;
 import com.sharper.meter.Readings;
 import org.apache.commons.codec.DecoderException;
 
@@ -33,6 +34,13 @@ public class MeterReader implements Runnable {
         } catch (DecoderException | InterruptedException e) {
             e.printStackTrace();
         }
+
+        catch (ReadingException e) {
+            System.out.println("Exception caought" + " "+ e.getMessage() + "writing last known value");
+            dao.connect();
+            dao.createReadings(meter.lastReadings);
+            dao.close();
+        }
         isReading = false; //releasing busy flag
 
     }
@@ -44,7 +52,14 @@ public class MeterReader implements Runnable {
 
             }
             isReading = true;
-            result = meter.getReadings();
+            try {
+                result = meter.getReadings();
+            }
+            catch (ReadingException e){
+                System.out.println("Exception caught" + " " + e.getMessage());
+                return meter.lastReadings;
+            }
+
             isReading = false;
             return  result;
 
