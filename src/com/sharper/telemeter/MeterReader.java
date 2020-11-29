@@ -39,19 +39,14 @@ public class MeterReader implements Runnable {
 
     public Readings getReadings() throws DecoderException, InterruptedException {
         Readings result;
-        if (isReading){
-            System.out.println("requested while blocked... returning values once read"); //diagnosting message
+        if (isReading) System.out.println("requested while blocked... returning values once read"); //diagnosting message
             while (isReading){
+
             }
-            return meter.lastReadings;
-        }
-        else {
             isReading = true;
             result = meter.getReadings();
             isReading = false;
-            return  result.isValid() ? result : meter.lastReadings; //in case reader returned zeroed values, filtering them out;
-        }
-
+            return  result;
 
     }
 }
