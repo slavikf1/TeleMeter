@@ -49,7 +49,7 @@ public class MeterReader implements Runnable {
             isReading = true;
             result = meter.getReadings();
             isReading = false;
-            return  result;
+            return  result.isValid() ? result : meter.lastReadings; //in case reader returned zeroed values, filtering them out;
         }
 
 
