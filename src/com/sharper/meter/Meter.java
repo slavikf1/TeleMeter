@@ -57,7 +57,7 @@ public class Meter {
         String instant = getResponse("63",14);
         float voltage = Float.parseFloat(instant.substring(0,4))/10;
         float current = Float.parseFloat(instant.substring(4,8))/100;
-        float power = Float.parseFloat(instant.substring(8, 14))/1000;
+        float power = Float.parseFloat(instant.substring(8, 14));
         Readings result = new Readings(serialNum,day,night,current,power,voltage);
         port.closePort();
         lastReadings = result;

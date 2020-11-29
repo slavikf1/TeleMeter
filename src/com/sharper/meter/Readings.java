@@ -1,16 +1,31 @@
 package com.sharper.meter;
 
+import org.checkerframework.checker.units.qual.C;
+import org.influxdb.annotation.Column;
+import org.influxdb.annotation.Measurement;
+import org.influxdb.annotation.TimeColumn;
+
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 
+@Measurement(name = "power")
 public class Readings {
 
     private int serialNum;
+    @TimeColumn
+    @Column(name = "time")
+    private Instant time;
     private Date date;
+    @Column(name = "day")
     private float day;
+    @Column(name = "night")
     private float night;
+    @Column(name = "current")
     private float current;
+    @Column(name = "power")
     private float power;
+    @Column(name = "voltage")
     private float voltage;
 
     public Readings(int serialNum, float day, float night, float current, float power, float voltage) {
@@ -21,6 +36,7 @@ public class Readings {
         this.current = current;
         this.power = power;
         this.voltage = voltage;
+        this.time = this.date.toInstant();
     }
 
 
@@ -59,6 +75,6 @@ public class Readings {
 
     public String toString(){
         return serialNum + " on " + getDateString() + ": " + "day: " + day + " night: "+night + " Voltage: "+ voltage +
-                " Current: " + current +" Power: "+ power;
+                " Current: " + current +" Power: "+ power/1000;
     }
 }

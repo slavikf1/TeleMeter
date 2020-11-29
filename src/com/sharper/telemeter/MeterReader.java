@@ -1,5 +1,6 @@
 package com.sharper.telemeter;
 
+import com.sharper.dao.ReadingsDAO;
 import com.sharper.meter.Meter;
 import com.sharper.meter.Readings;
 import org.apache.commons.codec.DecoderException;
@@ -8,9 +9,12 @@ public class MeterReader implements Runnable {
     public static volatile boolean isReading; //busy flag
 
     private Meter meter; //utilizing the same meter
+    private ReadingsDAO dao;
 
-    public MeterReader(Meter meter){
+    public MeterReader(Meter meter, ReadingsDAO dao){
+
         this.meter = meter;
+        this.dao = dao;
     }
 
     public void run() {
@@ -20,11 +24,16 @@ public class MeterReader implements Runnable {
         isReading = true; //setting up busy flag
 
         try {
-            System.out.println("\n"+meter.getReadings()+"\n");
+            Readings out = meter.getReadings();
+            dao.connect();
+                dao.createReadings(out);
+            dao.close();
+            System.out.println("\n"+out+"\n");
+
         } catch (DecoderException | InterruptedException e) {
             e.printStackTrace();
         }
-        isReading = false; //releasing the meter
+        isReading = false; //releasing busy flag
 
     }
 

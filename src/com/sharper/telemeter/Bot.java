@@ -23,7 +23,7 @@ public class Bot extends TelegramLongPollingBot {
 
 
     public void updateOnRecieved(Update update){
-        System.out.println("Update recieved");
+        System.out.println("Update received");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Bot extends TelegramLongPollingBot {
         try {
             Readings readings = reader.getReadings();
         String message = "День: " + readings.getDay() + "\nНочь: " + readings.getNight()+"\n"+
-                "Мощность: " + readings.getPower() + "\nТок: "  + readings.getCurrent();
+                "Мощность: " + readings.getPower()/1000 + "\nТок: "  + readings.getCurrent();
         sendMsg(update.getMessage().getChatId().toString(), message);
             System.out.println("sending update");
         }
