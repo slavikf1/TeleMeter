@@ -36,7 +36,7 @@ public class MeterReader implements Runnable {
         }
 
         catch (ReadingException e) {
-            System.out.println("Exception caought" + " "+ e.getMessage() + "writing last known value");
+            System.out.println("Exception caught" + " "+ e.getMessage() + "writing last known value");
             dao.connect();
             dao.createReadings(meter.lastReadings);
             dao.close();
@@ -56,8 +56,11 @@ public class MeterReader implements Runnable {
                 result = meter.getReadings();
             }
             catch (ReadingException e){
-                System.out.println("Exception caught" + " " + e.getMessage());
+                System.out.println("MeterReader: Exception caught" + " " + e.getMessage());
+                System.out.println("MeterReader: Returning last known values");
+                isReading = false;
                 return meter.lastReadings;
+
             }
 
             isReading = false;

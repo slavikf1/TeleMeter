@@ -45,7 +45,7 @@ public class TeleMeterApp {
 
 
         ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-        ScheduledFuture <?> scheduledFuture = ses.scheduleAtFixedRate(reader, 10, 10, TimeUnit.SECONDS);
+        ScheduledFuture <?> scheduledFuture = ses.scheduleAtFixedRate(reader, 0, 10, TimeUnit.SECONDS);
         //System.out.println("Schedule run... starting a bot");
 
         try{

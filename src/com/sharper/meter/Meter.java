@@ -43,16 +43,22 @@ public class Meter {
         byte[] response = Arrays.copyOfRange(buffer, 5, length-2);
         try {
             byte[] responseCRC = Arrays.copyOfRange(buffer, length-2, length);
-            byte[] responseBase  = Arrays.copyOfRange(buffer, 0, length-3);
+            byte[] responseBase  = Arrays.copyOfRange(buffer, 0, length-2);
 
-            if(checkCRC(responseBase, responseCRC)){
-                throw new ReadingException("Incorrect data from meter");
+            //checking CRC:
+            if(!checkCRC(responseBase, responseCRC)){
+                throw new ReadingException("Incorrect data from meter: " + "Respose CRC: " + Arrays.toString(responseCRC)
+                        + " Calculated CRC: " + Arrays.toString(crc16(responseBase)));
             }
+//            else {
+//                System.out.println("CRC correct: " + "Respose CRC: " + Arrays.toString(responseCRC)
+//                        + " Calculated CRC: " + Arrays.toString(crc16(responseBase)));
+//            }
 
         }
 
         catch (ArrayIndexOutOfBoundsException e){
-
+            throw new ReadingException("Incomplete data from the meter!");
         }
 
         returnedMessage = Hex.encodeHexString(response);
