@@ -80,11 +80,6 @@ public class Meter {
         float power = Float.parseFloat(instant.substring(8, 14));
         Readings result = new Readings(serialNum,day,night,current,power,voltage);
         port.closePort();
-        if (!result.isValid()){
-            System.out.println("invalid readings read... filtering out");
-            return lastReadings;
-        }
-
         lastReadings = result;
         return result;
     }

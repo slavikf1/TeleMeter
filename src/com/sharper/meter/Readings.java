@@ -82,8 +82,4 @@ public class Readings {
         return serialNum + " on " + getDateString() + ": " + "day: " + day + " night: "+night + " Voltage: "+ voltage +
                 " Current: " + current +" Power: "+ power/1000;
     }
-
-    public boolean isValid(){
-        return this.getDay() != 0 && this.getNight() != 0;
-    }
 }
