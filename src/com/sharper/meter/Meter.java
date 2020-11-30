@@ -38,7 +38,7 @@ public class Meter {
         //initSerialPort();
         port.writeBytes(outBuffer.array(), 7);
         byte[] buffer = new byte[length];
-        Thread.sleep(90);
+        Thread.sleep(100);
         port.readBytes(buffer, length);
         byte[] response = Arrays.copyOfRange(buffer, 5, length-2);
         try {
@@ -47,7 +47,7 @@ public class Meter {
 
             //checking CRC:
             if(!checkCRC(responseBase, responseCRC)){
-                throw new ReadingException("Incorrect data from meter: " + "Respose CRC: " + Arrays.toString(responseCRC)
+                throw new ReadingException("Incorrect data from meter: " + "Response CRC: " + Arrays.toString(responseCRC)
                         + " Calculated CRC: " + Arrays.toString(crc16(responseBase)));
             }
 //            else {
@@ -58,7 +58,7 @@ public class Meter {
         }
 
         catch (ArrayIndexOutOfBoundsException e){
-            throw new ReadingException("Incomplete data from the meter!");
+            throw new ReadingException("Incomplete data from the meter.");
         }
 
         returnedMessage = Hex.encodeHexString(response);
@@ -81,7 +81,7 @@ public class Meter {
         Readings result = new Readings(serialNum,day,night,current,power,voltage);
         port.closePort();
         if (!result.isValid()){
-            System.out.println("invalid readins read... filtering out");
+            System.out.println("invalid readings read... filtering out");
             return lastReadings;
         }
 
