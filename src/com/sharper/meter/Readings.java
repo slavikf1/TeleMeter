@@ -13,6 +13,11 @@ import java.util.Date;
 public class Readings {
 
     private int serialNum;
+
+    public void setTime(Date date) {
+        this.time = date.toInstant();
+    }
+
     @TimeColumn
     @Column(name = "time")
     private Instant time;

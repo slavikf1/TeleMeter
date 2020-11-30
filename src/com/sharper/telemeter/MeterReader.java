@@ -6,6 +6,8 @@ import com.sharper.meter.ReadingException;
 import com.sharper.meter.Readings;
 import org.apache.commons.codec.DecoderException;
 
+import java.util.Date;
+
 public class MeterReader implements Runnable {
     public static volatile boolean isReading; //busy flag
 
@@ -37,8 +39,9 @@ public class MeterReader implements Runnable {
 
         catch (ReadingException e) {
             System.out.println("Meter Reader: Exception caught" + " "+ e.getMessage() + " writing last known value to DB");
+            meter.lastReadings.setTime(new Date()); //updating time for current for last readings
             dao.connect();
-            dao.createReadings(meter.lastReadings);
+                dao.createReadings(meter.lastReadings);
             dao.close();
             System.out.println("\n"+ "Last known values are" + meter.lastReadings+"\n");
         }
