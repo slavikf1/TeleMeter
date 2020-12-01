@@ -2,7 +2,9 @@ package com.sharper.dao;
 
 import com.sharper.meter.Readings;
 import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBFactory;
+import org.influxdb.InfluxDBIOException;
 import org.influxdb.dto.Point;
 
 public class InfluxReadingsDAO implements ReadingsDAO {
@@ -20,32 +22,20 @@ public class InfluxReadingsDAO implements ReadingsDAO {
         this.database = database;
     }
 
-    public void createReadings(Readings readings){
+    public void createReadings (Readings readings) throws InfluxDBIOException{
         Point point = Point.measurementByPOJO(readings.getClass()).addFieldsFromPOJO(readings).build();
-        System.out.println("point created");
-        System.out.println(point.lineProtocol());
-        try {
+
             influxDB.write(point);
-            System.out.println("point written");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+            System.out.println("point written: " + point.lineProtocol());
 
     }
 
-    public void connect(){
+    public void connect() throws InfluxDBIOException {
 
-        try{
            influxDB = InfluxDBFactory.connect(url, username, password);
            influxDB.setDatabase(database);
            System.out.println("DB connected");
 
-        }
-        catch (Exception e){
-            System.out.println(e.getMessage());
-
-        }
     }
 
     public void close(){

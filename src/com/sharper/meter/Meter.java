@@ -21,7 +21,7 @@ public class Meter {
     }
 
         //Senging string 1-Byte command and getting a response.
-    private String getResponse(String message, int length) throws InterruptedException, DecoderException, ReadingException {
+    private synchronized String getResponse(String message, int length) throws InterruptedException, DecoderException, ReadingException {
 
         String returnedMessage = null;
         ByteBuffer outBuffer = ByteBuffer.allocate(7);
@@ -67,7 +67,7 @@ public class Meter {
     }
 
     //to get all Readings - see Readings class.
-    public Readings getReadings() throws DecoderException, InterruptedException, ReadingException {
+    public synchronized Readings getReadings() throws DecoderException, InterruptedException, ReadingException {
 
         initSerialPort();
         int serialNum = Integer.valueOf(getResponse("2F",11),16);
@@ -113,13 +113,13 @@ public class Meter {
     }
 
     //get meter's Serial number
-    public int getSerialNum() throws DecoderException, InterruptedException, ReadingException {
+    public synchronized int getSerialNum() throws DecoderException, InterruptedException, ReadingException {
         initSerialPort();
         port.closePort();
         return Integer.valueOf((this.getResponse("2F", 11)),16);
     }
 
-    private void initSerialPort() throws DecoderException, InterruptedException {
+    private synchronized void initSerialPort() throws DecoderException, InterruptedException {
 
         port.openPort();
         port.setParity(SerialPort.NO_PARITY);
