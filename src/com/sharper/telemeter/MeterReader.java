@@ -53,6 +53,8 @@ public class MeterReader implements Runnable {
             dao.connect();
             dao.createReadings(out);
 
+            //Переписать - в случае потери соедениния после записи последнего значения, оно будет добавлено в очередь в
+            //обоаботчике  - это приведет к задвоению значений.
             if (ReadingsQueue.size() > 0 ){
                 System.out.println("writing the queue to the DB: " + ReadingsQueue.size() + " elements:\n");
                 int counter = 0;
@@ -72,6 +74,7 @@ public class MeterReader implements Runnable {
             ReadingsQueue.add(out);
             System.out.println("wrote Readings to the queue... Queue size "  + ReadingsQueue.size() );
         }
+
         finally {
             dao.close();
         }
