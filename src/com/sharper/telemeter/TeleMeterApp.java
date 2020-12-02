@@ -1,7 +1,6 @@
 package com.sharper.telemeter;
 
 import com.sharper.dao.InfluxReadingsDAO;
-import com.sharper.dao.ReadingsDAO;
 import com.sharper.meter.Meter;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;

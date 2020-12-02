@@ -35,7 +35,6 @@ public class Meter {
         byte[] crc16 = crc16(crcBase); //base array to get CRC16 value
         outBuffer.put(crc16);
 
-        //initSerialPort();
         port.writeBytes(outBuffer.array(), 7);
         byte[] buffer = new byte[length];
         Thread.sleep(100);
@@ -50,11 +49,6 @@ public class Meter {
                 throw new ReadingException("Incorrect data from meter: " + "Response CRC: " + Arrays.toString(responseCRC)
                         + " Calculated CRC: " + Arrays.toString(crc16(responseBase)));
             }
-//            else {
-//                System.out.println("CRC correct: " + "Respose CRC: " + Arrays.toString(responseCRC)
-//                        + " Calculated CRC: " + Arrays.toString(crc16(responseBase)));
-//            }
-
         }
 
         catch (ArrayIndexOutOfBoundsException e){
@@ -62,7 +56,6 @@ public class Meter {
         }
 
         returnedMessage = Hex.encodeHexString(response);
-        //port.closePort();
         return  returnedMessage;
     }
 

@@ -30,7 +30,7 @@ public class InfluxReadingsDAO implements ReadingsDAO {
 
     }
 
-    public void connect() throws InfluxDBIOException {
+    public void connect() throws InfluxDBException {
 
            influxDB = InfluxDBFactory.connect(url, username, password);
            influxDB.setDatabase(database);

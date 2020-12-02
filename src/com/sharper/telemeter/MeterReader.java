@@ -5,6 +5,7 @@ import com.sharper.meter.Meter;
 import com.sharper.meter.ReadingException;
 import com.sharper.meter.Readings;
 import org.apache.commons.codec.DecoderException;
+import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBIOException;
 
 import java.util.Date;
@@ -34,8 +35,7 @@ public class MeterReader implements Runnable {
         try {
             isReading = true; //setting up busy flag
             out = meter.getReadings();
-            isReading = false; //releasing busy flag
-            System.out.println("\n"+out+"\n");
+            System.out.println("\nRead from meter: "+out+"\n");
         }
 
         catch (ReadingException | DecoderException | InterruptedException e ) {
@@ -69,7 +69,7 @@ public class MeterReader implements Runnable {
             }
         }
 
-        catch (InfluxDBIOException exception){
+        catch (InfluxDBException exception){
             System.out.println("Exception caught: " + exception.getMessage());
             ReadingsQueue.add(out);
             System.out.println("wrote Readings to the queue... Queue size "  + ReadingsQueue.size() );
@@ -95,7 +95,7 @@ public class MeterReader implements Runnable {
                 System.out.println("MeterReader: Returning last known values");
                 return meter.lastReadings;
             }
-                finally {
+            finally {
                 isReading = false;
             }
             return  result;
