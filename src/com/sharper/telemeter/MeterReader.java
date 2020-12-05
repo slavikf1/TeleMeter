@@ -49,7 +49,7 @@ public class MeterReader implements Runnable {
 
             //NO More filtering based on last readings:
             //meter.lastReadings.setTime(new Date()); //updating time for current for last readings
-            //out = meter.lastReadings;
+            out = meter.lastReadings;
             //System.out.println("\n"+ "Last known values are" + meter.lastReadings+"\n");
         }
 
