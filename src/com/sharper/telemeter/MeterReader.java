@@ -6,7 +6,6 @@ import com.sharper.meter.ReadingException;
 import com.sharper.meter.Readings;
 import org.apache.commons.codec.DecoderException;
 import org.influxdb.InfluxDBException;
-import org.influxdb.InfluxDBIOException;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -28,6 +27,13 @@ public class MeterReader implements Runnable {
     public void run() {
         if (isReading) System.out.println("requested while blocked... pending for freeing up"); //diagnostic message
         while (isReading){
+            try{
+               wait();
+            }
+            catch (InterruptedException e){
+                System.out.println("Caught Interrrupted Excpection: ");
+                e.printStackTrace();
+            }
         }
 
         Readings out;
@@ -35,18 +41,21 @@ public class MeterReader implements Runnable {
         try {
             isReading = true; //setting up busy flag
             out = meter.getReadings();
-            System.out.println("\nRead from meter: "+out+"\n");
+            //System.out.println("\nRead from meter: "+out+"\n");
         }
 
         catch (ReadingException | DecoderException | InterruptedException e ) {
-            System.out.println("Meter Reader: Exception caught" + " "+ e.getMessage() + " writing last known value to DB");
-            meter.lastReadings.setTime(new Date()); //updating time for current for last readings
-            out = meter.lastReadings;
-            System.out.println("\n"+ "Last known values are" + meter.lastReadings+"\n");
+            System.out.println("Meter Reader: Exception caught" + " "+ e.getMessage() + " ignoring readings");
+
+            //NO More filtering based on last readings:
+            //meter.lastReadings.setTime(new Date()); //updating time for current for last readings
+            //out = meter.lastReadings;
+            //System.out.println("\n"+ "Last known values are" + meter.lastReadings+"\n");
         }
 
         finally {
             isReading = false; //releasing busy flag
+            notifyAll(); //notifying other threads
         }
 
         try {
@@ -84,6 +93,7 @@ public class MeterReader implements Runnable {
         Readings result;
         if (isReading) System.out.println("requested while blocked... returning values once read"); //diagnosting message
             while (isReading){
+                    wait();
             }
 
             try {
@@ -97,6 +107,7 @@ public class MeterReader implements Runnable {
             }
             finally {
                 isReading = false;
+                notifyAll();
             }
             return  result;
 
