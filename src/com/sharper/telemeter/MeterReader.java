@@ -7,7 +7,6 @@ import com.sharper.meter.Readings;
 import org.apache.commons.codec.DecoderException;
 import org.influxdb.InfluxDBException;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -22,43 +21,47 @@ public class MeterReader implements Runnable {
         this.meter = meter;
         this.dao = dao;
         ReadingsQueue = new LinkedList<>();
+        isReading = false;
     }
 
     public void run() {
         if (isReading) System.out.println("requested while blocked... pending for freeing up"); //diagnostic message
-        while (isReading){
-            try{
-               wait();
-            }
-            catch (InterruptedException e){
-                System.out.println("Caught Interrrupted Excpection: ");
-                e.printStackTrace();
-            }
-        }
-
         Readings out;
+        synchronized (meter) {
+            while (isReading) {
+                try {
+                    meter.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                isReading = true; //setting up busy flag
+                out = meter.getReadings();
+                System.out.println("\nRead from meter: " + out + "\n");
+            } catch (ReadingException | DecoderException | InterruptedException e) {
+                System.out.println("Meter Reader: Exception caught" + " " + e.getMessage() + " ignoring readings");
+
+                //NO More filtering based on last readings:
+                //meter.lastReadings.setTime(new Date()); //updating time for current for last readings
+                out = meter.lastReadings;
+                //System.out.println("\n"+ "Last known values are" + meter.lastReadings+"\n");
+            }
+
+            finally {
+                isReading = false; //releasing busy flag
+                try {
+                    meter.notifyAll();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //notifying other threads
+            }
+        }
 
         try {
-            isReading = true; //setting up busy flag
-            out = meter.getReadings();
-            //System.out.println("\nRead from meter: "+out+"\n");
-        }
-
-        catch (ReadingException | DecoderException | InterruptedException e ) {
-            System.out.println("Meter Reader: Exception caught" + " "+ e.getMessage() + " ignoring readings");
-
-            //NO More filtering based on last readings:
-            //meter.lastReadings.setTime(new Date()); //updating time for current for last readings
-            out = meter.lastReadings;
-            //System.out.println("\n"+ "Last known values are" + meter.lastReadings+"\n");
-        }
-
-        finally {
-            isReading = false; //releasing busy flag
-            notifyAll(); //notifying other threads
-        }
-
-        try {
+            System.out.println("inside 1st TRY block");
             dao.connect();
             dao.createReadings(out);
 
@@ -91,25 +94,29 @@ public class MeterReader implements Runnable {
 
     public Readings getReadings() throws DecoderException, InterruptedException {
         Readings result;
-        if (isReading) System.out.println("requested while blocked... returning values once read"); //diagnosting message
-            while (isReading){
-                    wait();
+        synchronized (meter) {
+            if (isReading)
+                System.out.println("requested while blocked... returning values once read"); //diagnosting message
+            while (isReading) {
+                try {
+                    meter.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
+            isReading = true;
             try {
-                isReading = true;
                 result = meter.getReadings();
-            }
-            catch (ReadingException e){
+            } catch (ReadingException e) {
                 System.out.println("MeterReader: Exception caught" + " " + e.getMessage());
                 System.out.println("MeterReader: Returning last known values");
                 return meter.lastReadings;
-            }
-            finally {
+            } finally {
                 isReading = false;
-                notifyAll();
+                meter.notifyAll();
             }
-            return  result;
-
+            return result;
+        }
     }
 }

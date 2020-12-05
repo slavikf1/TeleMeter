@@ -20,6 +20,7 @@ public class InfluxReadingsDAO implements ReadingsDAO {
         this.username = username;
         this.password = password;
         this.database = database;
+        System.out.println("DAO Creadted");
     }
 
     public void createReadings (Readings readings) throws InfluxDBIOException{
